@@ -6,6 +6,7 @@ import com.saadahmedev.productservice.entity.Image;
 import com.saadahmedev.productservice.entity.Product;
 import com.saadahmedev.productservice.repository.ImageRepository;
 import com.saadahmedev.productservice.repository.ProductRepository;
+import com.saadahmedev.productservice.util.DateTimeUtil;
 import com.saadahmedev.productservice.util.ValidatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,12 +49,16 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
+        String creationTime = DateTimeUtil.getCurrentDateTime();
+
         Product product = Product.builder()
                 .title(productRequest.getTitle())
                 .description(productRequest.getDescription())
                 .price(productRequest.getPrice())
                 .discount(productRequest.getDiscount() == null ? 0 : productRequest.getDiscount())
                 .images(imageData)
+                .createdAt(creationTime)
+                .updatedAt(creationTime)
                 .build();
 
         try {
