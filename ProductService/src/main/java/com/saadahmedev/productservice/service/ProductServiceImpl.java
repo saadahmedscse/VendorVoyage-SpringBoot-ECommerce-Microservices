@@ -78,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<?> getProducts() {
-        return null;
+        return new ResponseEntity<>(productRepository.findAll(), HttpStatus.OK);
     }
 
     @Override
