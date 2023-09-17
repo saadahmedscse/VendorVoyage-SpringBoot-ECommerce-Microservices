@@ -20,7 +20,7 @@ public class Product {
     private String description;
     private double price;
     private int discount;
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Image> images;
     private String createdAt;
     private String updatedAt;
