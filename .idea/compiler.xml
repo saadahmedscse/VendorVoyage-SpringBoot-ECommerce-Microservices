@@ -7,15 +7,17 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="ServiceRegistry" />
         <module name="ApiGateway" />
         <module name="ProductService" />
-        <module name="ServiceRegistry" />
+        <module name="InventoryService" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="ApiGateway" options="-parameters" />
+      <module name="InventoryService" options="-parameters" />
       <module name="ProductService" options="-parameters" />
       <module name="ServiceRegistry" options="-parameters" />
     </option>
