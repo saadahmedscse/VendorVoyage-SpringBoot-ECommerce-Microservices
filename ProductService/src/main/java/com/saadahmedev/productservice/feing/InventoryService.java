@@ -5,6 +5,7 @@ import com.saadahmedev.productservice.dto.InventoryResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,4 +19,7 @@ public interface InventoryService {
 
     @GetMapping("/api/inventory/{id}")
     ResponseEntity<InventoryResponse> getProduct(@PathVariable long id);
+
+    @DeleteMapping("/api/inventory/{id}")
+    ResponseEntity<ApiResponse> deleteProduct(@PathVariable long id);
 }
