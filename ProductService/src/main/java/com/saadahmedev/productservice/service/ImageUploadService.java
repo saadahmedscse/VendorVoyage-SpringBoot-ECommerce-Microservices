@@ -39,4 +39,16 @@ public class ImageUploadService {
 
         return imageList;
     }
+
+    public void deleteImage(Image image) {
+        String[] url = image.getUrl().split("/");
+        String imageName = url[url.length - 1];
+        String imagePath = imageUploadDirectory + File.separator + imageName;
+        File file = new File(imagePath);
+        if (file.exists()) file.delete();
+    }
+
+    public void deleteImages(List<Image> images) {
+        for (Image image : images) deleteImage(image);
+    }
 }
