@@ -42,4 +42,9 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable long id) {
         return productService.deleteProduct(id);
     }
+
+    @DeleteMapping("/image/{id}/{imageId}")
+    public ResponseEntity<?> deleteImage(@PathVariable long id, @PathVariable long imageId) {
+        return productService.deleteProductImage(id, imageId);
+    }
 }
