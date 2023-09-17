@@ -22,7 +22,7 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory inventory = new Inventory();
         inventory.setProductId(id);
         optionalInventory.ifPresent(value -> inventory.setProductCount(value.getProductCount() + productCount));
-        inventory.setProductCount(productCount);
+        inventory.setProductCount(optionalInventory.map(value -> value.getProductCount() + productCount).orElse(productCount));
 
         try {
             inventoryRepository.save(inventory);
