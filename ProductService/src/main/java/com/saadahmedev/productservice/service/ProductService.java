@@ -14,6 +14,8 @@ public interface ProductService {
 
     ResponseEntity<?> updateProduct(long id, List<MultipartFile> images, ProductRequest productRequest);
 
+    ResponseEntity<?> deleteProductImage(long id, long imageId);
+
     ResponseEntity<?> getProducts();
 
     ResponseEntity<?> getProduct(long id);
