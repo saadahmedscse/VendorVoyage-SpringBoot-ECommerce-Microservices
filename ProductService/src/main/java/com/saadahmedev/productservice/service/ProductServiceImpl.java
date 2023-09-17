@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -77,7 +78,61 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<?> updateProduct(long id, List<MultipartFile> images, ProductRequest productRequest) {
-        return null;
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isEmpty())
+            return new ResponseEntity<>(new ApiResponse(false, "Product not found"), HttpStatus.BAD_REQUEST);
+        Product product = getProduct(productRequest, optionalProduct);
+        List<Image> imageData = new ArrayList<>();
+        if (images != null && !images.isEmpty()) {
+            try {
+                imageData = imageUploadService.uploadImage(images);
+                for (Image image : imageData) product.getImages().add(image);
+
+            } catch (IOException e) {
+                return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        try {
+            imageRepository.saveAll(imageData);
+            productRepository.save(product);
+
+            return new ResponseEntity<>(new ApiResponse(true, "Product updated successfully"), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private static Product getProduct(ProductRequest productRequest, Optional<Product> optionalProduct) {
+        Product product = optionalProduct.get();
+
+        if (productRequest.getTitle() != null && !productRequest.getTitle().isEmpty()) product.setTitle(productRequest.getTitle());
+        if (productRequest.getDescription() != null && !productRequest.getDescription().isEmpty()) product.setDescription(productRequest.getDescription());
+        if (productRequest.getPrice() != null) product.setPrice(productRequest.getPrice());
+        if (productRequest.getDiscount() != null) product.setDiscount(productRequest.getDiscount());
+        product.setUpdatedAt(DateTimeUtil.getCurrentDateTime());
+        return product;
+    }
+
+    @Override
+    public ResponseEntity<?> deleteProductImage(long id, long imageId) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Product not found"), HttpStatus.BAD_REQUEST);
+        Optional<Image> optionalImage = imageRepository.findById(imageId);
+        if (optionalImage.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Image not found"), HttpStatus.BAD_REQUEST);
+        Product product = optionalProduct.get();
+        Image image = optionalImage.get();
+        product.getImages().removeIf(i -> i.getId().equals(imageId));
+
+        try {
+            productRepository.save(product);
+            imageRepository.delete(image);
+            imageUploadService.deleteImage(image);
+
+            return new ResponseEntity<>(new ApiResponse(true, "Image has been deleted"), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
@@ -109,11 +164,43 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<?> getProduct(long id) {
-        return null;
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Product not found"), HttpStatus.BAD_REQUEST);
+
+        Product p = optionalProduct.get();
+        InventoryResponse inventoryResponse = inventoryService.getProduct(p.getId()).getBody();
+        ProductWrapper productWrapper = ProductWrapper.builder()
+                .id(p.getId())
+                .title(p.getTitle())
+                .description(p.getDescription())
+                .price(p.getPrice())
+                .discount(p.getDiscount())
+                .images(p.getImages())
+                .isAvailable(inventoryResponse.getProductCount() > 0)
+                .inStock(inventoryResponse.getProductCount())
+                .createdAt(p.getCreatedAt())
+                .updatedAt(p.getUpdatedAt())
+                .build();
+
+        return new ResponseEntity<>(productWrapper, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<?> deleteProduct(long id) {
-        return null;
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Product not found"), HttpStatus.BAD_REQUEST);
+        Product product = optionalProduct.get();
+        List<Image> images = product.getImages();
+
+        try {
+            productRepository.delete(product);
+            inventoryService.deleteProduct(product.getId());
+            imageUploadService.deleteImages(images);
+            for (Image image : images) imageRepository.delete(imageRepository.findById(image.getId()).get());
+
+            return new ResponseEntity<>(new ApiResponse(true, "Product has been deleted"), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
