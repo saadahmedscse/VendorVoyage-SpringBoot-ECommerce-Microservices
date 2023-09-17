@@ -15,8 +15,5 @@ public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String filename;
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] imageData;
+    private String url;
 }
