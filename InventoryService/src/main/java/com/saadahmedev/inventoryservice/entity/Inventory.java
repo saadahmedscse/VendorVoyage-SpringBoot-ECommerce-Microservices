@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Inventory {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long productId;
     private int productCount;
 }
