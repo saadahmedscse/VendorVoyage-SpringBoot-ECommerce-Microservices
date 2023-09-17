@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,23 +29,19 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ValidatorUtil validatorUtil;
 
+    @Autowired
+    private ImageUploadService imageUploadService;
+
     @Override
     public ResponseEntity<?> createProduct(List<MultipartFile> images, ProductRequest productRequest) {
         ResponseEntity<?> validationResult = validatorUtil.isCreateProductRequestValid(images, productRequest);
         if (validationResult.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)) return validationResult;
 
-        List<Image> imageData = new ArrayList<>();
-        for (MultipartFile file : images) {
-            try {
-                imageData.add(
-                        Image.builder()
-                                .filename(file.getOriginalFilename())
-                                .imageData(file.getBytes())
-                                .build()
-                );
-            } catch (IOException e) {
-                return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        List<Image> imageData;
+        try {
+            imageData = imageUploadService.uploadImage(images);
+        } catch (IOException e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         String creationTime = DateTimeUtil.getCurrentDateTime();
