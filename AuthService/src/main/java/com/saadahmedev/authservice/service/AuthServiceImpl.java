@@ -85,7 +85,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<?> logout(HttpServletRequest request) {
-        return null;
+        String requestHeader = request.getHeader("Authorization");
+        String token = requestHeader.substring(7);
+
+        try {
+            tokenRepository.deleteById(token);
+            return new ResponseEntity<>(new ApiResponse(true, "Logged out successfully"), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
