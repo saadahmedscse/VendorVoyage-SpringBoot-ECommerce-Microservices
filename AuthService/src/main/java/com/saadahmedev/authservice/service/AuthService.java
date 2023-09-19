@@ -14,6 +14,4 @@ public interface AuthService {
     ResponseEntity<?> login(LoginRequest loginRequest);
 
     ResponseEntity<?> logout(HttpServletRequest request);
-
-    ResponseEntity<?> validateToken(String bearerToken);
 }

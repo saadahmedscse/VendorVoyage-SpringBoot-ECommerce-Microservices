@@ -45,8 +45,6 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private TokenRepository tokenRepository;
 
-    private String jwtToken = null;
-
     @Override
     public ResponseEntity<?> createAccount(CreateAccountRequest createAccountRequest) {
         ResponseEntity<?> validationResult = requestValidator.isCreateAccountRequestValid(createAccountRequest);
@@ -73,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         final UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
-        jwtToken = jwtUtil.generateToken(userDetails);
+        String jwtToken = jwtUtil.generateToken(userDetails);
 
         try {
             tokenRepository.save(new Token(jwtToken));
@@ -94,10 +92,5 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    @Override
-    public ResponseEntity<?> validateToken(String bearerToken) {
-        return null;
     }
 }
