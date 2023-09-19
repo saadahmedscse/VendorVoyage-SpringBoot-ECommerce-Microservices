@@ -11,12 +11,14 @@
         <module name="ApiGateway" />
         <module name="ProductService" />
         <module name="InventoryService" />
+        <module name="AuthService" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="ApiGateway" options="-parameters" />
+      <module name="AuthService" options="-parameters" />
       <module name="InventoryService" options="-parameters" />
       <module name="ProductService" options="-parameters" />
       <module name="ServiceRegistry" options="-parameters" />
