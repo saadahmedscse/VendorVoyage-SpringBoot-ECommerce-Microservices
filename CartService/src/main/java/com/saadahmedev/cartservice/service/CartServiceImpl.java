@@ -66,7 +66,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseEntity<?> getCartItems(HttpServletRequest request) {
-        return null;
+        long userId = getUserId(request);
+        if (userId == -1) return userNotFound();
+
+        return new ResponseEntity<>(cartRepository.findCartByUserId(userId), HttpStatus.OK);
     }
 
     private long getUserId(HttpServletRequest request) {
