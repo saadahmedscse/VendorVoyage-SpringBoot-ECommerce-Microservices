@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 public interface CartService {
 
-    ResponseEntity<?> addProduct(Cart cart);
+    ResponseEntity<?> addProduct(HttpServletRequest request, Cart cart);
 
-    ResponseEntity<?> replaceItemCount(Cart cart);
+    ResponseEntity<?> replaceItemCount(HttpServletRequest request, Cart cart);
 
-    ResponseEntity<?> increaseItem(long productId);
+    ResponseEntity<?> increaseItem(HttpServletRequest request, long productId);
 
-    ResponseEntity<?> decreaseItem(long productId);
+    ResponseEntity<?> decreaseItem(HttpServletRequest request, long productId);
 
-    ResponseEntity<?> removeItem(long productId);
+    ResponseEntity<?> removeItem(HttpServletRequest request, long productId);
 
-    ResponseEntity<?> getCartItems();
+    ResponseEntity<?> getCartItems(HttpServletRequest request);
 }
