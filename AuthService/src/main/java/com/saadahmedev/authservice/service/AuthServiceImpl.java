@@ -1,9 +1,6 @@
 package com.saadahmedev.authservice.service;
 
-import com.saadahmedev.authservice.dto.ApiResponse;
-import com.saadahmedev.authservice.dto.CreateAccountRequest;
-import com.saadahmedev.authservice.dto.LoginRequest;
-import com.saadahmedev.authservice.dto.LoginResponse;
+import com.saadahmedev.authservice.dto.*;
 import com.saadahmedev.authservice.entity.Token;
 import com.saadahmedev.authservice.entity.User;
 import com.saadahmedev.authservice.repository.TokenRepository;
@@ -20,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -102,6 +101,13 @@ public class AuthServiceImpl implements AuthService {
         if (!jwtUtil.validateToken(token.getToken(), userDetails)) return sendUnauthorizedResponse();
 
         return new ResponseEntity<>(new ApiResponse(true, "Request Authorization Success"), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<UserResponse> getUser(Token token) {
+        String username = jwtUtil.getUsernameFromToken(token.getToken());
+        Optional<User> optionalUser = userRepository.findByEmail(username);
+        return optionalUser.map(user -> new ResponseEntity<>(new UserResponse(user.getId(), user.getName(), user.getEmail()), HttpStatus.OK)).orElse(null);
     }
 
     private ResponseEntity<ApiResponse> sendUnauthorizedResponse() {
