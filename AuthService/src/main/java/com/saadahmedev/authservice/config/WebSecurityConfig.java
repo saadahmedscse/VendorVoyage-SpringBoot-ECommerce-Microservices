@@ -31,6 +31,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/create").permitAll()
+                        .requestMatchers("/api/auth/validate-token").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));
