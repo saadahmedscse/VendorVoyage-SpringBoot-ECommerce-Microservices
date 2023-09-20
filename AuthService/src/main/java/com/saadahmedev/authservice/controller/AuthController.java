@@ -2,6 +2,7 @@ package com.saadahmedev.authservice.controller;
 
 import com.saadahmedev.authservice.dto.CreateAccountRequest;
 import com.saadahmedev.authservice.dto.LoginRequest;
+import com.saadahmedev.authservice.dto.UserResponse;
 import com.saadahmedev.authservice.entity.Token;
 import com.saadahmedev.authservice.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,5 +35,11 @@ public class AuthController {
     @PostMapping("/validate-token")
     public ResponseEntity<?> validateToken(@RequestBody Token token) {
         return authService.validateToken(token);
+    }
+
+    @PostMapping("/user")
+    public ResponseEntity<UserResponse> getUser(@RequestBody Token token) {
+        System.out.println(token.getToken());
+        return authService.getUser(token);
     }
 }
