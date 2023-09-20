@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="CartService" />
         <module name="ServiceRegistry" />
         <module name="ApiGateway" />
         <module name="ProductService" />
@@ -19,6 +20,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="ApiGateway" options="-parameters" />
       <module name="AuthService" options="-parameters" />
+      <module name="CartService" options="-parameters" />
       <module name="InventoryService" options="-parameters" />
       <module name="ProductService" options="-parameters" />
       <module name="ServiceRegistry" options="-parameters" />
