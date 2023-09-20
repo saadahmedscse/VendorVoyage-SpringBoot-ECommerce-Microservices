@@ -93,4 +93,18 @@ public class AuthServiceImpl implements AuthService {
             return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Override
+    public ResponseEntity<ApiResponse> validateToken(Token token) {
+        if (tokenRepository.findById(token.getToken()).isEmpty()) return sendUnauthorizedResponse();
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(jwtUtil.getUsernameFromToken(token.getToken()));
+        if (!jwtUtil.validateToken(token.getToken(), userDetails)) return sendUnauthorizedResponse();
+
+        return new ResponseEntity<>(new ApiResponse(true, "Request Authorization Success"), HttpStatus.OK);
+    }
+
+    private ResponseEntity<ApiResponse> sendUnauthorizedResponse() {
+        return new ResponseEntity<>(new ApiResponse(false, "Token is not valid"), HttpStatus.UNAUTHORIZED);
+    }
 }
