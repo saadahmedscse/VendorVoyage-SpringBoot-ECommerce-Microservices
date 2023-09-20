@@ -2,6 +2,7 @@ package com.saadahmedev.cartservice.controller;
 
 import com.saadahmedev.cartservice.entity.Cart;
 import com.saadahmedev.cartservice.service.CartService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,32 +15,32 @@ public class CartController {
     private CartService cartService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addProduct(@RequestBody Cart cart) {
-        return cartService.addProduct(cart);
+    public ResponseEntity<?> addProduct(HttpServletRequest request, @RequestBody Cart cart) {
+        return cartService.addProduct(request, cart);
     }
 
     @GetMapping("/replace")
-    public ResponseEntity<?> replaceItemCount(@RequestBody Cart cart) {
-        return cartService.replaceItemCount(cart);
+    public ResponseEntity<?> replaceItemCount(HttpServletRequest request, @RequestBody Cart cart) {
+        return cartService.replaceItemCount(request, cart);
     }
 
     @GetMapping("/increase/{id}")
-    public ResponseEntity<?> increaseItem(@PathVariable long id) {
-        return cartService.increaseItem(id);
+    public ResponseEntity<?> increaseItem(HttpServletRequest request, @PathVariable long id) {
+        return cartService.increaseItem(request, id);
     }
 
     @GetMapping("/decrease/{id}")
-    public ResponseEntity<?> decreaseItem(@PathVariable long id) {
-        return cartService.decreaseItem(id);
+    public ResponseEntity<?> decreaseItem(HttpServletRequest request, @PathVariable long id) {
+        return cartService.decreaseItem(request, id);
     }
 
     @DeleteMapping("/remove/{id}")
-    public ResponseEntity<?> removeItem(@PathVariable long id) {
-        return cartService.removeItem(id);
+    public ResponseEntity<?> removeItem(HttpServletRequest request, @PathVariable long id) {
+        return cartService.removeItem(request, id);
     }
 
     @GetMapping
-    public ResponseEntity<?> getCartItems() {
-        return cartService.getCartItems();
+    public ResponseEntity<?> getCartItems(HttpServletRequest request) {
+        return cartService.getCartItems(request);
     }
 }
