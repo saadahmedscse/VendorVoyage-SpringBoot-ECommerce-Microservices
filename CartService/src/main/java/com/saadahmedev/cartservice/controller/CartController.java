@@ -49,7 +49,7 @@ public class CartController {
         return cartService.getCartItemsById(id);
     }
 
-    @DeleteMapping("/remove/{id}")
+    @DeleteMapping("/remove/user/{id}")
     public ResponseEntity<?> removeCartByUserId(@PathVariable long id) {
         return cartService.deleteCartById(id);
     }
