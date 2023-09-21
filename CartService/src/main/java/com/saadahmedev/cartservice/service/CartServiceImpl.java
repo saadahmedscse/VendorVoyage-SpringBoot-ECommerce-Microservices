@@ -7,6 +7,7 @@ import com.saadahmedev.cartservice.dto.UserResponse;
 import com.saadahmedev.cartservice.entity.Cart;
 import com.saadahmedev.cartservice.feing.AuthService;
 import com.saadahmedev.cartservice.feing.InventoryService;
+import com.saadahmedev.cartservice.feing.ProductService;
 import com.saadahmedev.cartservice.repository.CartRepository;
 import com.saadahmedev.cartservice.util.DateTimeUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,6 +32,9 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private InventoryService inventoryService;
+
+    @Autowired
+    private ProductService productService;
 
     @Override
     public ResponseEntity<?> addProduct(HttpServletRequest request, Cart cart) {
@@ -163,8 +169,14 @@ public class CartServiceImpl implements CartService {
     public ResponseEntity<?> getCartItems(HttpServletRequest request) {
         long userId = getUserId(request);
         if (userId == -1) return userNotFound();
+        List<Cart> cartList = cartRepository.findCartByUserId(userId);
+        List<Long> productIds = new ArrayList<>();
 
-        return new ResponseEntity<>(cartRepository.findCartByUserId(userId), HttpStatus.OK);
+        for (Cart item : cartList) {
+            productIds.add(item.getProductId());
+        }
+
+        return new ResponseEntity<>(productService.getCartProducts(productIds).getBody(), HttpStatus.OK);
     }
 
     private long getUserId(HttpServletRequest request) {
