@@ -39,7 +39,6 @@ public class AuthController {
 
     @PostMapping("/user")
     public ResponseEntity<UserResponse> getUser(@RequestBody Token token) {
-        System.out.println(token.getToken());
         return authService.getUser(token);
     }
 }
