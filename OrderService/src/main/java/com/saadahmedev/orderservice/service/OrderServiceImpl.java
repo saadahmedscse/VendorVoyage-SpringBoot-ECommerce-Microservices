@@ -104,6 +104,7 @@ public class OrderServiceImpl implements OrderService {
             productCountRepository.saveAll(productCountList);
             shippingDetailsRepository.save(shippingDetails);
             paymentStatusRepository.save(paymentStatus);
+            cartService.removeCartByUserId(userId);
             Order savedOrder = orderRepository.save(order);
             return new ResponseEntity<>(new OrderPlaceResponse(true, "Order placed successfully", savedOrder.getId()), HttpStatus.CREATED);
         } catch (Exception e) {
