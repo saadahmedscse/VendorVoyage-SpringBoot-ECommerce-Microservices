@@ -1,5 +1,6 @@
 package com.saadahmedev.orderservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,17 +20,18 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @JsonIgnore
     private long userId;
     private double totalPrice;
     private int discount;
     private double grandTotal;
-    @ElementCollection
-    private List<Long> productIds;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Product> products;
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private ShippingDetails shippingDetails;
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private PaymentStatus paymentStatus;
     private Date createdAt;
     private Date updatedAt;
