@@ -10,8 +10,6 @@ public interface CartService {
 
     ResponseEntity<?> addProduct(HttpServletRequest request, Cart cart);
 
-    ResponseEntity<?> replaceItemCount(HttpServletRequest request, long productId, int itemCount);
-
     ResponseEntity<?> increaseItem(HttpServletRequest request, long productId);
 
     ResponseEntity<?> decreaseItem(HttpServletRequest request, long productId);

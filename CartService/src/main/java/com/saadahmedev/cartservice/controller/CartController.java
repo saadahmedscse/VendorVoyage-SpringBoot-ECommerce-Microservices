@@ -19,11 +19,6 @@ public class CartController {
         return cartService.addProduct(request, cart);
     }
 
-    @GetMapping("/replace/{productId}/{itemCount}")
-    public ResponseEntity<?> replaceItemCount(HttpServletRequest request, @PathVariable long productId, @PathVariable int itemCount) {
-        return cartService.replaceItemCount(request, productId, itemCount);
-    }
-
     @GetMapping("/increase/{id}")
     public ResponseEntity<?> increaseItem(HttpServletRequest request, @PathVariable long id) {
         return cartService.increaseItem(request, id);
