@@ -19,4 +19,6 @@ public interface CartService {
     ResponseEntity<?> deleteCart(HttpServletRequest request);
 
     ResponseEntity<?> getCartItems(HttpServletRequest request);
+
+    ResponseEntity<?> getCartItemsById(long userId);
 }

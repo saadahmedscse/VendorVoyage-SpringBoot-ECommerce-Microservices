@@ -43,4 +43,9 @@ public class CartController {
     public ResponseEntity<?> getCartItems(HttpServletRequest request) {
         return cartService.getCartItems(request);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCartItemsByUserId(@PathVariable long id) {
+        return cartService.getCartItemsById(id);
+    }
 }

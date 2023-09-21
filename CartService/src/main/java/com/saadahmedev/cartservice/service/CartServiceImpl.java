@@ -4,6 +4,7 @@ import com.saadahmedev.cartservice.dto.ApiResponse;
 import com.saadahmedev.cartservice.dto.InventoryResponse;
 import com.saadahmedev.cartservice.dto.Token;
 import com.saadahmedev.cartservice.dto.UserResponse;
+import com.saadahmedev.cartservice.dto.product.Product;
 import com.saadahmedev.cartservice.entity.Cart;
 import com.saadahmedev.cartservice.feing.AuthService;
 import com.saadahmedev.cartservice.feing.InventoryService;
@@ -17,9 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -169,14 +168,35 @@ public class CartServiceImpl implements CartService {
     public ResponseEntity<?> getCartItems(HttpServletRequest request) {
         long userId = getUserId(request);
         if (userId == -1) return userNotFound();
+
+        return new ResponseEntity<>(getCartItems(userId), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> getCartItemsById(long userId) {
+        return new ResponseEntity<>(getCartItems(userId), HttpStatus.OK);
+    }
+
+    private List<Product> getCartItems(long userId) {
         List<Cart> cartList = cartRepository.findCartByUserId(userId);
+        if (cartList.isEmpty()) return new ArrayList<>();
+
+
         List<Long> productIds = new ArrayList<>();
+        Map<Long, Integer> productCountMap = new HashMap<>();
 
         for (Cart item : cartList) {
             productIds.add(item.getProductId());
+            productCountMap.put(item.getProductId(), item.getItemCount());
         }
 
-        return new ResponseEntity<>(productService.getCartProducts(productIds).getBody(), HttpStatus.OK);
+        List<Product> productList = productService.getCartProducts(productIds).getBody();
+        assert productList != null;
+        for (Product product : productList) {
+            product.setItemCount(productCountMap.get(product.getId()));
+        }
+
+        return productList;
     }
 
     private long getUserId(HttpServletRequest request) {
