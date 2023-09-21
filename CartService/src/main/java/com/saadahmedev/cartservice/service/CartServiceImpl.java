@@ -177,6 +177,16 @@ public class CartServiceImpl implements CartService {
         return new ResponseEntity<>(getCartItems(userId), HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<?> deleteCartById(long id) {
+        try {
+            cartRepository.deleteAllByUserId(id);
+            return new ResponseEntity<>(new ApiResponse(true, "Cart deleted successfully"), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private List<Product> getCartItems(long userId) {
         List<Cart> cartList = cartRepository.findCartByUserId(userId);
         if (cartList.isEmpty()) return new ArrayList<>();
