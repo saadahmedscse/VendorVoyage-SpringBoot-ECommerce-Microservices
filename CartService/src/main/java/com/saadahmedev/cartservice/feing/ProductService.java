@@ -1,5 +1,6 @@
 package com.saadahmedev.cartservice.feing;
 
+import com.saadahmedev.cartservice.dto.product.Product;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,5 +14,5 @@ import java.util.List;
 public interface ProductService {
 
     @PostMapping("api/product/cart")
-    ResponseEntity<?> getCartProducts(@RequestBody List<Long> productIds);
+    ResponseEntity<List<Product>> getCartProducts(@RequestBody List<Long> productIds);
 }
