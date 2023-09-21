@@ -39,6 +39,11 @@ public class CartController {
         return cartService.removeItem(request, id);
     }
 
+    @DeleteMapping("/remove")
+    public ResponseEntity<?> removeCart(HttpServletRequest request) {
+        return cartService.deleteCart(request);
+    }
+
     @GetMapping
     public ResponseEntity<?> getCartItems(HttpServletRequest request) {
         return cartService.getCartItems(request);
