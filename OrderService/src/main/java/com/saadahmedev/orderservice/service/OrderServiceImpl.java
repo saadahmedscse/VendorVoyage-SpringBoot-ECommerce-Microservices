@@ -15,6 +15,7 @@ import com.saadahmedev.orderservice.repository.PaymentStatusRepository;
 import com.saadahmedev.orderservice.repository.ProductCountRepository;
 import com.saadahmedev.orderservice.repository.ShippingDetailsRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,6 +132,21 @@ public class OrderServiceImpl implements OrderService {
         if (optionalOrder.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Order not found"), HttpStatus.BAD_REQUEST);
 
         return new ResponseEntity<>(mapToOrderResponse(optionalOrder.get()), HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<?> deleteOrder(HttpServletRequest request, long id) {
+        long userId = getUserId(request);
+        Optional<Order> optionalOrder = orderRepository.findByIdAndUserId(id, userId);
+        if (optionalOrder.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Order not found"), HttpStatus.BAD_REQUEST);
+
+        try {
+            orderRepository.deleteByIdAndUserId(id, userId);
+            return new ResponseEntity<>(new ApiResponse(true, "Order deleted successfully"), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private OrderResponse mapToOrderResponse(Order order) {
