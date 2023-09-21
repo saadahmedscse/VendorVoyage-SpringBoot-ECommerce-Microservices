@@ -178,6 +178,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<?> deleteCartById(long id) {
         try {
             cartRepository.deleteAllByUserId(id);
