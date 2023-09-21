@@ -28,4 +28,9 @@ public class OrderController {
     public ResponseEntity<?> getOrder(HttpServletRequest request, @PathVariable long id) {
         return orderService.getOrder(request, id);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteOrder(HttpServletRequest request, @PathVariable long id) {
+        return orderService.deleteOrder(request, id);
+    }
 }
