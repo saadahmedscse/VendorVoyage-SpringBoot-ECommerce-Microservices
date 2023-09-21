@@ -62,8 +62,20 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> replaceItemCount(HttpServletRequest request, Cart cart) {
-        return null;
+    public ResponseEntity<?> replaceItemCount(HttpServletRequest request, long productId, int itemCount) {
+        long userId = getUserId(request);
+        Optional<Cart> optionalCart = cartRepository.findCartByUserIdAndProductId(userId, productId);
+        if (optionalCart.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Item not found"), HttpStatus.BAD_REQUEST);
+        Cart cart = optionalCart.get();
+        cart.setItemCount(itemCount);
+        cart.setUpdatedAt(DateTimeUtil.getCurrentDateTime());
+
+        try {
+            cartRepository.save(cart);
+            return new ResponseEntity<>(new ApiResponse(true, "Item count updated successfully"), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
