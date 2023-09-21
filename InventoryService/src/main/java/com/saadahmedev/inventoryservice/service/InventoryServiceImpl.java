@@ -53,7 +53,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public ResponseEntity<?> getProduct(long id) {
         Optional<Inventory> optionalInventory = inventoryRepository.findById(id);
-        if (optionalInventory.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Product not found in inventory"), HttpStatus.BAD_REQUEST);
+        if (optionalInventory.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Product not found in inventory"), HttpStatus.OK);
 
         return new ResponseEntity<>(optionalInventory.get(), HttpStatus.OK);
     }
