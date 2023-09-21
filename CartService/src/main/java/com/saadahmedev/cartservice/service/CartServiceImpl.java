@@ -1,10 +1,12 @@
 package com.saadahmedev.cartservice.service;
 
 import com.saadahmedev.cartservice.dto.ApiResponse;
+import com.saadahmedev.cartservice.dto.InventoryResponse;
 import com.saadahmedev.cartservice.dto.Token;
 import com.saadahmedev.cartservice.dto.UserResponse;
 import com.saadahmedev.cartservice.entity.Cart;
 import com.saadahmedev.cartservice.feing.AuthService;
+import com.saadahmedev.cartservice.feing.InventoryService;
 import com.saadahmedev.cartservice.repository.CartRepository;
 import com.saadahmedev.cartservice.util.DateTimeUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,13 +27,25 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private CartRepository cartRepository;
 
+    @Autowired
+    private InventoryService inventoryService;
+
     @Override
     public ResponseEntity<?> addProduct(HttpServletRequest request, Cart cart) {
         long userId = getUserId(request);
         if (userId == -1) return userNotFound();
         Optional<Cart> optionalCart = cartRepository.findCartByUserIdAndProductId(userId, cart.getProductId());
+
+        ApiResponse apiResponse = inventoryService.getProductError(cart.getProductId()).getBody();
+        if (apiResponse.message() != null) return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        InventoryResponse inventoryResponse = inventoryService.getProduct(cart.getProductId()).getBody();
+
         String creationTime = DateTimeUtil.getCurrentDateTime();
         Cart newCart;
+        int itemCount = optionalCart.map(value -> value.getItemCount() + cart.getItemCount()).orElseGet(cart::getItemCount);
+        if (itemCount > inventoryResponse.getProductCount()) {
+            return new ResponseEntity<>(new ApiResponse(false, "Not enough item present in inventory"), HttpStatus.BAD_REQUEST);
+        }
 
         if (optionalCart.isEmpty()) {
             newCart = Cart.builder()
@@ -62,30 +76,59 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> replaceItemCount(HttpServletRequest request, long productId, int itemCount) {
+    public ResponseEntity<?> increaseItem(HttpServletRequest request, long productId) {
         long userId = getUserId(request);
         Optional<Cart> optionalCart = cartRepository.findCartByUserIdAndProductId(userId, productId);
         if (optionalCart.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Item not found"), HttpStatus.BAD_REQUEST);
+
         Cart cart = optionalCart.get();
+        int itemCount = cart.getItemCount() + 1;
+
+        ApiResponse apiResponse = inventoryService.getProductError(cart.getProductId()).getBody();
+        if (apiResponse.message() != null) return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        InventoryResponse inventoryResponse = inventoryService.getProduct(cart.getProductId()).getBody();
+
+        if (itemCount > inventoryResponse.getProductCount()) {
+            return new ResponseEntity<>(new ApiResponse(false, "Not enough item present in inventory"), HttpStatus.BAD_REQUEST);
+        }
+
         cart.setItemCount(itemCount);
         cart.setUpdatedAt(DateTimeUtil.getCurrentDateTime());
 
         try {
             cartRepository.save(cart);
-            return new ResponseEntity<>(new ApiResponse(true, "Item count updated successfully"), HttpStatus.CREATED);
+            return new ResponseEntity<>(new ApiResponse(true, "Item count increased by 1"), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public ResponseEntity<?> increaseItem(HttpServletRequest request, long productId) {
-        return null;
-    }
-
-    @Override
+    @Transactional
     public ResponseEntity<?> decreaseItem(HttpServletRequest request, long productId) {
-        return null;
+        long userId = getUserId(request);
+        Optional<Cart> optionalCart = cartRepository.findCartByUserIdAndProductId(userId, productId);
+        if (optionalCart.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "Item not found"), HttpStatus.BAD_REQUEST);
+        Cart cart = optionalCart.get();
+        int count = cart.getItemCount() - 1;
+        if (count == 0) {
+            try {
+                cartRepository.deleteCartByUserIdAndProductId(userId, productId);
+                return new ResponseEntity<>(new ApiResponse(true, "Item has been removed"), HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        cart.setItemCount(count);
+        cart.setUpdatedAt(DateTimeUtil.getCurrentDateTime());
+
+        try {
+            cartRepository.save(cart);
+            return new ResponseEntity<>(new ApiResponse(true, "Item count decreased by 1"), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
