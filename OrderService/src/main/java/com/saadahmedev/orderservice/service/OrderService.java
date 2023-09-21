@@ -12,5 +12,5 @@ public interface OrderService {
 
     ResponseEntity<?> getOrders(HttpServletRequest request);
 
-    ResponseEntity<?> getOrder(HttpServletRequest request, String id);
+    ResponseEntity<?> getOrder(HttpServletRequest request, long id);
 }
