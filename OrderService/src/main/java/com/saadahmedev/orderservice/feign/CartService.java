@@ -18,6 +18,6 @@ public interface CartService {
     @GetMapping("api/cart/{id}")
     ResponseEntity<List<Product>> getCartItems(@PathVariable long id);
 
-    @DeleteMapping("api/cart/remove/{id}")
+    @DeleteMapping("api/cart/remove/user/{id}")
     ResponseEntity<ApiResponse> removeCartByUserId(@PathVariable long id);
 }
