@@ -13,4 +13,6 @@ public interface OrderService {
     ResponseEntity<?> getOrders(HttpServletRequest request);
 
     ResponseEntity<?> getOrder(HttpServletRequest request, long id);
+
+    ResponseEntity<?> deleteOrder(HttpServletRequest request, long id);
 }
