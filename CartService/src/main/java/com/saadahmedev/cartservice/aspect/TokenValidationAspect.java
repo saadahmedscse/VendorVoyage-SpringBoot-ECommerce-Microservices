@@ -21,7 +21,7 @@ public class TokenValidationAspect {
     @Autowired
     private AuthService authService;
 
-    @Around("execution(public * com.saadahmedev.cartservice.service.CartService.*(..))")
+    @Around("execution(public * com.saadahmedev.cartservice.service.CartService.*(..)) && !execution(public * com.saadahmedev.cartservice.service.CartService.getCartItemsById(..))")
     public Object validateToken(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
