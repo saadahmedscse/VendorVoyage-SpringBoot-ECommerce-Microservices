@@ -47,4 +47,9 @@ public class ProductController {
     public ResponseEntity<?> deleteImage(@PathVariable long id, @PathVariable long imageId) {
         return productService.deleteProductImage(id, imageId);
     }
+
+    @PostMapping("/cart")
+    public ResponseEntity<?> getCartProducts(@RequestBody List<Long> productIds) {
+        return productService.getCartProducts(productIds);
+    }
 }

@@ -203,4 +203,16 @@ public class ProductServiceImpl implements ProductService {
             return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Override
+    public ResponseEntity<?> getCartProducts(List<Long> productIds) {
+        List<Product> productList = new ArrayList<>();
+
+        for (Long id : productIds) {
+            Optional<Product> product = productRepository.findById(id);
+            product.ifPresent(productList::add);
+        }
+
+        return new ResponseEntity<>(productList, HttpStatus.OK);
+    }
 }

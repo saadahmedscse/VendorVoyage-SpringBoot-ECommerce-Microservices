@@ -21,4 +21,6 @@ public interface ProductService {
     ResponseEntity<?> getProduct(long id);
 
     ResponseEntity<?> deleteProduct(long id);
+
+    ResponseEntity<?> getCartProducts(List<Long> productIds);
 }
