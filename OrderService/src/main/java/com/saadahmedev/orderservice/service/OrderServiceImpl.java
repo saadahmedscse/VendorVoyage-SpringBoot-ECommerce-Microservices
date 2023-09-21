@@ -1,7 +1,7 @@
 package com.saadahmedev.orderservice.service;
 
 import com.saadahmedev.orderservice.dto.ApiResponse;
-import com.saadahmedev.orderservice.dto.OrderResponse;
+import com.saadahmedev.orderservice.dto.OrderPlaceResponse;
 import com.saadahmedev.orderservice.dto.Token;
 import com.saadahmedev.orderservice.dto.UserResponse;
 import com.saadahmedev.orderservice.dto.product.Product;
@@ -88,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
             shippingDetailsRepository.save(shippingDetails);
             paymentStatusRepository.save(paymentStatus);
             Order savedOrder = orderRepository.save(order);
-            return new ResponseEntity<>(new OrderResponse(true, "Order placed successfully", savedOrder.getId()), HttpStatus.CREATED);
+            return new ResponseEntity<>(new OrderPlaceResponse(true, "Order placed successfully", savedOrder.getId()), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
