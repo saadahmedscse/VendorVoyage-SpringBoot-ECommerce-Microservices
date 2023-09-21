@@ -25,7 +25,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOrder(HttpServletRequest request, @PathVariable String id) {
+    public ResponseEntity<?> getOrder(HttpServletRequest request, @PathVariable long id) {
         return orderService.getOrder(request, id);
     }
 }
