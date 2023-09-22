@@ -2,10 +2,7 @@ package com.saadahmedev.orderservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saadahmedev.orderservice.dto.ApiResponse;
-import com.saadahmedev.orderservice.dto.OrderPlaceResponse;
-import com.saadahmedev.orderservice.dto.Token;
-import com.saadahmedev.orderservice.dto.UserResponse;
+import com.saadahmedev.orderservice.dto.*;
 import com.saadahmedev.orderservice.dto.kafka.OrderEvent;
 import com.saadahmedev.orderservice.dto.kafka.PaymentEvent;
 import com.saadahmedev.orderservice.dto.orderResponse.OrderResponse;
@@ -20,6 +17,8 @@ import com.saadahmedev.orderservice.repository.ProductCountRepository;
 import com.saadahmedev.orderservice.repository.ShippingDetailsRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,18 +54,21 @@ public class OrderServiceImpl implements OrderService, OnMessageReceived {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    private Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+
     @Override
-    public ResponseEntity<?> createOrder(HttpServletRequest request, ShippingDetails shippingDetails) {
+    public ResponseEntity<?> createOrder(HttpServletRequest request, ShippingDetailsRequest shippingDetailsRequest) {
         long userId = getUserId(request);
         if (userId == -1) return userNotFound();
 
         List<Product> productList = cartService.getCartItems(userId).getBody();
         List<com.saadahmedev.orderservice.entity.Product> productCountList = new ArrayList<>();
+        assert productList != null;
+        if (productList.isEmpty()) return new ResponseEntity<>(new ApiResponse(false, "There are no products in your cart"), HttpStatus.BAD_REQUEST);
 
         double totalPrice = 0;
         double grandTotal = 0;
 
-        assert productList != null;
         for (Product product : productList) {
             productCountList.add(
                     com.saadahmedev.orderservice.entity.Product.builder()
@@ -85,9 +87,17 @@ public class OrderServiceImpl implements OrderService, OnMessageReceived {
 
         PaymentStatus paymentStatus = PaymentStatus.builder()
                 .transactionId(UUID.randomUUID().toString())
-                .status(PaymentStatusEnum.SUCCESS)
+                .status(PaymentStatusEnum.PENDING)
                 .amount(grandTotal)
-                .message("Payment completed successfully")
+                .message(null)
+                .payType(shippingDetailsRequest.getPayType())
+                .build();
+
+        ShippingDetails shippingDetails = ShippingDetails.builder()
+                .name(shippingDetailsRequest.getName())
+                .email(shippingDetailsRequest.getEmail())
+                .phone(shippingDetailsRequest.getPhone())
+                .address(shippingDetailsRequest.getAddress())
                 .build();
 
         Date creationTime = new Date();
@@ -105,24 +115,24 @@ public class OrderServiceImpl implements OrderService, OnMessageReceived {
                 .build();
 
         try {
-            //productCountRepository.saveAll(productCountList);
-            //shippingDetailsRepository.save(shippingDetails);
-            //paymentStatusRepository.save(paymentStatus);
-//            cartService.removeCartByUserId(userId);
-            //Order savedOrder = orderRepository.save(order);
+            productCountRepository.saveAll(productCountList);
+            shippingDetailsRepository.save(shippingDetails);
+            paymentStatusRepository.save(paymentStatus);
+            cartService.removeCartByUserId(userId);
+            Order savedOrder = orderRepository.save(order);
 
             OrderEvent orderEvent = OrderEvent.builder()
-                    .orderId(5)
+                    .orderId(savedOrder.getId())
                     .userId(userId)
                     .amount(grandTotal)
-                    .payType(shippingDetails.getPayType())
+                    .payType(shippingDetailsRequest.getPayType())
                     .message("An order has been created for user " + userId)
                     .build();
 
             String orderEventSerialized = new ObjectMapper().writeValueAsString(orderEvent);
             kafkaTemplate.send("order-event", orderEventSerialized);
 
-            return new ResponseEntity<>(new OrderPlaceResponse(true, "Order placed successfully", 5), HttpStatus.CREATED);
+            return new ResponseEntity<>(new OrderPlaceResponse(true, "Order placed successfully", savedOrder.getId()), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -131,7 +141,7 @@ public class OrderServiceImpl implements OrderService, OnMessageReceived {
     @Override
     public ResponseEntity<?> getOrders(HttpServletRequest request) {
         long userId = getUserId(request);
-        List<Order> orderList = orderRepository.findAllByUserId(userId);
+        List<Order> orderList = orderRepository.findAllByUserIdOrderByIdDesc(userId);
         if (orderList.isEmpty()) return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
 
         List<OrderResponse> orderResponseList = new ArrayList<>();
@@ -209,6 +219,15 @@ public class OrderServiceImpl implements OrderService, OnMessageReceived {
     @Override
     public void onEvent(String event) throws JsonProcessingException {
         PaymentEvent paymentEvent = new ObjectMapper().readValue(event, PaymentEvent.class);
-        System.out.println(paymentEvent);
+        logger.info(String.valueOf(paymentEvent));
+        Order order = orderRepository.findById(paymentEvent.getOrderId()).get();
+        order.getPaymentStatus().setStatus(paymentEvent.getPaymentStatus());
+        order.getPaymentStatus().setMessage(paymentEvent.getMessage());
+
+        try {
+            orderRepository.save(order);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
     }
 }
