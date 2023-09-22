@@ -1,7 +1,6 @@
 package com.saadahmedev.orderservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.saadahmedev.orderservice.dto.kafka.PayType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +21,4 @@ public class ShippingDetails {
     private String phone;
     private String email;
     private String address;
-    @Enumerated(EnumType.STRING)
-    private PayType payType;
 }
