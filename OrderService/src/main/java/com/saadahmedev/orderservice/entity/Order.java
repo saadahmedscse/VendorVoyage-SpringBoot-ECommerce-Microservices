@@ -18,7 +18,7 @@ import java.util.List;
 @Table(name = "table_order")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @JsonIgnore
     private long userId;
