@@ -1,9 +1,13 @@
 package com.saadahmedev.orderservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saadahmedev.orderservice.dto.ApiResponse;
 import com.saadahmedev.orderservice.dto.OrderPlaceResponse;
 import com.saadahmedev.orderservice.dto.Token;
 import com.saadahmedev.orderservice.dto.UserResponse;
+import com.saadahmedev.orderservice.dto.kafka.OrderEvent;
+import com.saadahmedev.orderservice.dto.kafka.PaymentEvent;
 import com.saadahmedev.orderservice.dto.orderResponse.OrderResponse;
 import com.saadahmedev.orderservice.dto.product.Product;
 import com.saadahmedev.orderservice.entity.*;
@@ -16,17 +20,16 @@ import com.saadahmedev.orderservice.repository.ProductCountRepository;
 import com.saadahmedev.orderservice.repository.ShippingDetailsRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class OrderServiceImpl implements OrderService, OnMessageReceived {
 
     @Autowired
     private OrderRepository orderRepository;
@@ -49,7 +52,8 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private ProductService productService;
 
-    private Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Override
     public ResponseEntity<?> createOrder(HttpServletRequest request, ShippingDetails shippingDetails) {
@@ -101,12 +105,24 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         try {
-            productCountRepository.saveAll(productCountList);
-            shippingDetailsRepository.save(shippingDetails);
-            paymentStatusRepository.save(paymentStatus);
-            cartService.removeCartByUserId(userId);
-            Order savedOrder = orderRepository.save(order);
-            return new ResponseEntity<>(new OrderPlaceResponse(true, "Order placed successfully", savedOrder.getId()), HttpStatus.CREATED);
+            //productCountRepository.saveAll(productCountList);
+            //shippingDetailsRepository.save(shippingDetails);
+            //paymentStatusRepository.save(paymentStatus);
+//            cartService.removeCartByUserId(userId);
+            //Order savedOrder = orderRepository.save(order);
+
+            OrderEvent orderEvent = OrderEvent.builder()
+                    .orderId(5)
+                    .userId(userId)
+                    .amount(grandTotal)
+                    .payType(shippingDetails.getPayType())
+                    .message("An order has been created for user " + userId)
+                    .build();
+
+            String orderEventSerialized = new ObjectMapper().writeValueAsString(orderEvent);
+            kafkaTemplate.send("order-event", orderEventSerialized);
+
+            return new ResponseEntity<>(new OrderPlaceResponse(true, "Order placed successfully", 5), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -188,5 +204,11 @@ public class OrderServiceImpl implements OrderService {
 
     private ResponseEntity<?> userNotFound() {
         return new ResponseEntity<>(new ApiResponse(false, "User not found"), HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public void onEvent(String event) throws JsonProcessingException {
+        PaymentEvent paymentEvent = new ObjectMapper().readValue(event, PaymentEvent.class);
+        System.out.println(paymentEvent);
     }
 }
