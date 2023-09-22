@@ -1,6 +1,6 @@
 package com.saadahmedev.orderservice.controller;
 
-import com.saadahmedev.orderservice.entity.ShippingDetails;
+import com.saadahmedev.orderservice.dto.ShippingDetailsRequest;
 import com.saadahmedev.orderservice.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<?> createOrder(HttpServletRequest request, @RequestBody ShippingDetails shippingDetails) {
+    public ResponseEntity<?> createOrder(HttpServletRequest request, @RequestBody ShippingDetailsRequest shippingDetails) {
         return orderService.createOrder(request, shippingDetails);
     }
 
