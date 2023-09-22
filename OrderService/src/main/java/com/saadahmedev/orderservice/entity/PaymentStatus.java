@@ -1,6 +1,7 @@
 package com.saadahmedev.orderservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.saadahmedev.orderservice.dto.kafka.PayType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,4 +23,6 @@ public class PaymentStatus {
     private PaymentStatusEnum status;
     private double amount;
     private String message;
+    @Enumerated(EnumType.STRING)
+    private PayType payType;
 }
