@@ -1,5 +1,6 @@
 package com.saadahmedev.orderservice.dto.kafka;
 
+import com.saadahmedev.orderservice.entity.PaymentStatusEnum;
 import lombok.*;
 
 @Data
@@ -12,6 +13,6 @@ public class PaymentEvent {
     private long orderId;
     private double amount;
     private String message;
-    private PaymentStatus paymentStatus;
+    private PaymentStatusEnum paymentStatus;
     private PayType payType;
 }
