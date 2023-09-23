@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/fallback")
 public class FallbackController {
 
-    @GetMapping("/product-service")
+    @RequestMapping("/product-service")
     public ResponseEntity<?> productFallback() {
         return fallBackResponse("Product");
     }
