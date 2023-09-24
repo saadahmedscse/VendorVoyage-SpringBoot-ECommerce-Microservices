@@ -69,7 +69,7 @@ public class CartController {
         return cartService.deleteCartById(id);
     }
 
-    private ResponseEntity<?> fallBack(Exception e) {
+    private ResponseEntity<?> fallback(Exception e) {
         if (e.getMessage().startsWith("SNAE_")) {
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage().split("_")[1]), HttpStatus.SERVICE_UNAVAILABLE);
         } else {
