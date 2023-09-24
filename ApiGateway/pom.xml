@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.saadahmedev</groupId>
     <artifactId>ApiGateway</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>ApiGateway</name>
     <description>ApiGateway</description>
     <properties>
@@ -56,6 +56,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+
+        <finalName>vendor-voyage-api-gateway</finalName>
     </build>
 
 </project>
