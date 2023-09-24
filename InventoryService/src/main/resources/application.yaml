@@ -1,0 +1,32 @@
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+resilience4j:
+  circuitbreaker:
+    configs:
+      commonConfig:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        sliding-window-type: count_based
+    instances:
+      createProduct:
+        base-config: commonConfig
+      purchaseProduct:
+        base-config: commonConfig
+      getProduct:
+        base-config: commonConfig
+      deleteProduct:
+        base-config: commonConfig
