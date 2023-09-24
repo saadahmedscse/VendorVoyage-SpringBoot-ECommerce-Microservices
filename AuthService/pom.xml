@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.saadahmedev</groupId>
     <artifactId>AuthService</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>AuthService</name>
     <description>AuthService</description>
     <properties>
@@ -111,6 +111,8 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <finalName>vendor-voyage-auth-service</finalName>
     </build>
 
 </project>
