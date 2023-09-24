@@ -2,6 +2,7 @@ package com.saadahmedev.productservice.feing;
 
 import com.saadahmedev.productservice.dto.ApiResponse;
 import com.saadahmedev.productservice.dto.InventoryResponse;
+import com.saadahmedev.productservice.util.AppConstants;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Service
-@FeignClient("INVENTORY-SERVICE")
+@FeignClient(name = "INVENTORY-SERVICE", url = AppConstants.BASE_URL)
 public interface InventoryService {
 
     @PostMapping("/api/inventory/add/{id}/{count}")
