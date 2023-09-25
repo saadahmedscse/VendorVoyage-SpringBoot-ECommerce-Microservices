@@ -7,10 +7,12 @@ import feign.Response;
 import feign.Util;
 import feign.codec.ErrorDecoder;
 import lombok.SneakyThrows;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Map;
 
+@Component
 public class FeignErrorDecoder implements ErrorDecoder {
 
     @SneakyThrows
