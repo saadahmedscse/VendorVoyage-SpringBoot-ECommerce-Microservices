@@ -3,7 +3,6 @@ package com.saadahmedev.apigateway.controller;
 import com.saadahmedev.apigateway.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,22 +15,22 @@ public class FallbackController {
         return fallBackResponse("Product");
     }
 
-    @GetMapping("/cart-service")
+    @RequestMapping("/cart-service")
     public ResponseEntity<?> cartFallback() {
         return fallBackResponse("Cart");
     }
 
-    @GetMapping("/auth-service")
+    @RequestMapping("/auth-service")
     public ResponseEntity<?> authFallback() {
         return fallBackResponse("Auth");
     }
 
-    @GetMapping("/inventory-service")
+    @RequestMapping("/inventory-service")
     public ResponseEntity<?> inventoryFallback() {
         return fallBackResponse("Inventory");
     }
 
-    @GetMapping("/order-service")
+    @RequestMapping("/order-service")
     public ResponseEntity<?> orderFallback() {
         return fallBackResponse("Order");
     }
