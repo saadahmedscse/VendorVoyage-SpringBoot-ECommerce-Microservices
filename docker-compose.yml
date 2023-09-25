@@ -1,0 +1,111 @@
+version: '3'
+
+## SERVICES
+
+services:
+  discovery-server:
+    image: saadahmedscse/vendor-voyage-discovery-server:latest
+    ports:
+      - "8761:8761"
+    networks:
+      - v9pre
+
+  api-gateway:
+    image: saadahmedscse/vendor-voyage-api-gateway:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+      - auth-service
+      - cart-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+    networks:
+      - v9pre
+
+  auth-service:
+    image: saadahmedscse/vendor-voyage-auth-service:latest
+    ports:
+      - "8081:8081"
+    depends_on:
+      - discovery-server
+      - user-database
+    restart: always
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://user-database:3306/user_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: vampire
+    networks:
+      - v9pre
+
+  cart-service:
+    image: saadahmedscse/vendor-voyage-cart-service:latest
+    ports:
+      - "8082:8082"
+    depends_on:
+      - discovery-server
+      - cart-database
+    restart: always
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://cart-database:3306/cart_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: vampire
+    networks:
+      - v9pre
+
+## DATABASES
+  user-database:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: vampire
+      MYSQL_DATABASE: user_service
+    ports:
+      - "3307:3306"
+    networks:
+      - v9pre
+
+  inventory-database:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: v3ndor-hola
+      MYSQL_DATABASE: inventory_service
+    ports:
+      - "3308:3306"
+    networks:
+      - v9pre
+
+  product-database:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: vampire
+      MYSQL_DATABASE: product_service
+    ports:
+      - "3309:3306"
+    networks:
+      - v9pre
+
+  order-database:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: v3ndor-hola
+      MYSQL_DATABASE: order_service
+    ports:
+      - "3310:3306"
+    networks:
+      - v9pre
+
+  cart-database:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: vampire
+      MYSQL_DATABASE: cart_service
+    ports:
+      - "3311:3306"
+    networks:
+      - v9pre
+
+networks:
+  v9pre:
+    driver: bridge
