@@ -62,14 +62,10 @@ services:
       - inventory-service
 ```
 
-<div style="display: flex; align-items: center;">
-  <a href="https://github.com/saadahmedscse/VendorVoyage-SpringBoot-ECommerce-Microservices/blob/master/docker-compose.yml">
-    <img src="./GitAssets/docker_compose_button.png" alt="" height="35">
-  </a>
-  <h4 style="margin-left: 10px;">GET THE docker-compose.yml TO RUN THE WHOLE PROJECT</h4>
-</div>
+<a href="https://github.com/saadahmedscse/VendorVoyage-SpringBoot-ECommerce-Microservices/blob/master/docker-compose.yml"><img src="./GitAssets/docker_compose_button.png" alt="" height="35"></a>
 
 ```shell
+# GET THE docker-compose.yml BY CLICKING ON THIS BUTTON ABOVE TO RUN THE WHOLE PROJECT
 # LOCATE THE docker-compose.yml DIRECTORY AND EXECUTE THIS COMMAND
 docker-compose up -d
 ```
