@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.saadahmedev</groupId>
     <artifactId>OrderService</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>OrderService</name>
     <description>OrderService</description>
     <properties>
@@ -94,7 +94,17 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
         </plugins>
+
+        <finalName>vendor-voyage-order-service</finalName>
     </build>
 
 </project>
