@@ -13,7 +13,6 @@ import java.util.List;
 public class ValidatorUtil {
 
     public ResponseEntity<?> isCreateProductRequestValid(List<MultipartFile> images, ProductRequest productRequest) {
-        if (images == null || images.isEmpty()) return generateErrorResponse("At least one image is required");
         if (productRequest.getTitle() == null || productRequest.getTitle().isEmpty()) return generateErrorResponse("Title is required");
         if (productRequest.getDescription() == null || productRequest.getDescription().isEmpty()) return generateErrorResponse("Description is required");
         if (productRequest.getPrice() == null) return generateErrorResponse("Price is required");

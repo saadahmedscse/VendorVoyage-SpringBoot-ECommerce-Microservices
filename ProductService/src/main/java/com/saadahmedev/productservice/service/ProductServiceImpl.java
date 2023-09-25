@@ -45,9 +45,9 @@ public class ProductServiceImpl implements ProductService {
         ResponseEntity<?> validationResult = validatorUtil.isCreateProductRequestValid(images, productRequest);
         if (validationResult.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)) return validationResult;
 
-        List<Image> imageData;
+        List<Image> imageData = new ArrayList<>();
         try {
-            imageData = imageUploadService.uploadImage(images);
+            if (images != null && !images.isEmpty()) imageData = imageUploadService.uploadImage(images);
         } catch (IOException e) {
             return new ResponseEntity<>(new ApiResponse(false, e.getLocalizedMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
 
         try {
-            imageRepository.saveAll(imageData);
+            if (images != null && !images.isEmpty()) imageRepository.saveAll(imageData);
             Product p = productRepository.save(product);
             ResponseEntity<ApiResponse> apiResponse = inventoryService.createProduct(p.getId(), productRequest.getStock());
             if (!apiResponse.getStatusCode().isSameCodeAs(HttpStatus.CREATED)) return apiResponse;
